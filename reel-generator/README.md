@@ -1,2 +1,0 @@
-# reel-generator
-reel generator

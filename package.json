@@ -11,14 +11,18 @@
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
     "bcryptjs": "^3.0.2",
+    "imagekit": "^6.0.0",
+    "imagekitio-next": "^1.0.1",
     "mongoose": "^8.10.1",
     "next": "15.1.7",
+    "next-auth": "^4.24.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/mongoose": "^5.11.96",
+    "@types/next-auth": "^3.13.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

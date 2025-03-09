@@ -1,6 +1,6 @@
 "use client";
-import React, { useRef , useState } from "react";  
-import { ImageKitProvider, IKUpload } from "imagekitio-next";
+import React, {  useState } from "react";  
+import { IKUpload } from "imagekitio-next";
 import { Loader2 } from "lucide-react";
 import { IKUploadResponse } from "imagekitio-next/dist/types/components/IKUpload/props";
 import { set } from "mongoose";
@@ -11,8 +11,7 @@ interface FileUploadProps {
     fileType ?: "image" | "video";
 }
 
-const publicKey = process.env.NEXT_PUBLIC_PUBLIC_KEY;
-const urlEndpoint = process.env.NEXT_PUBLIC_URL_ENDPOINT;
+
 
 
 
@@ -28,14 +27,46 @@ export default function FileUpload({
     const [error, setError] = useState<string | null>(null);
     
     
-    const onUploadProgress = (progress) => {
-        console.log("Progress", progress);
+    const handleProgress = (evt: ProgressEvent) => {
+       if(evt.lengthComputable && onProgress) {
+        const percentComplete = Math.round(evt.loaded / evt.total * 100);
+        onProgress(Math.round(percentComplete));
+       }
       };
       
-      const onUploadStart = (evt) => {
-        console.log("Start", evt);
+      const handleStartUpload = ()=> {
+
+        setUploading(true);
+        setError(null);
       };
       
+      const validateFile = (file : File) => {
+        if(fileType === "video") {
+          if(!file.type.startsWith("video/")) {
+          setError("Please upload a video file")
+          return false;
+        }
+        if(file.size > 100 *1024*1024)
+          {
+            setError("Please upload a file less than 100MB")
+            return false;
+          }
+      }
+        else {
+          const validtypes = ["image/jpeg", "image/png", "image/webp" ];
+        if(!validtypes.includes(file.type)) {
+          
+          setError("Please upload a valid image file(JPEG, PNG,WEBP")
+          return false;
+        }
+        if(file.size > 5 *1024*1024)
+          {
+            setError("Please upload a file less than 10MB")
+            return false;
+          }
+        }
+        return false;
+    }
 
     const onError = (err : {message : string}) => {
         console.log("Error", err);
@@ -43,63 +74,42 @@ export default function FileUpload({
         setUploading(false);
       };
  
-      const onSuccess = (res) => {
-        console.log("Success", res);
+      const handleSuccess = (response :IKUploadResponse) => {
+        console.log("Success", response);
+        setUploading(false);
+        setError(null);
+        onSuccess(response);
       };
 
   return (
-    <div className="App">
-      <h1>ImageKit Next.js quick start</h1>
+    <div className="space-y-2">
      
-        <p>Upload an image with advanced options</p>
         <IKUpload
-          fileName="test-upload.jpg"
-          tags={["sample-tag1", "sample-tag2"]}
-          customCoordinates={"10,10,10,10"}
-          isPrivateFile={false}
+          fileName={fileType === "video" ? "video": "iamge"  }
           useUniqueFileName={true}
-          responseFields={["tags"]}
-          validateFile={(file) => file.size < 2000000}
-          folder={"/sample-folder"}
-          {/* extensions={[
-            {
-              name: "remove-bg",
-              options: {
-                add_shadow: true,
-              },
-            },
-          ]} */}
-          webhookUrl="https://www.example.com/imagekit-webhook" // replace with your webhookUrl
-          overwriteFile={true}
-          overwriteAITags={true}
-          overwriteTags={true}
-          overwriteCustomMetadata={true}
-          {/* customMetadata={{
-            "brand": "Nike",
-            "color": "red",
-          }} */}
+          validateFile={validateFile}
+          accept = {fileType === "video" ? "video/*": "image/*"  }
+          className="file-input file-input-bordered w-full "
           onError={onError}
-          onSuccess={onSuccess}
-          onUploadProgress={onUploadProgress}
-          onUploadStart={onUploadStart}
-          transformation={{
-            pre: "l-text,i-Imagekit,fs-50,l-end",
-            post: [
-              {
-                type: "transformation",
-                value: "w-100",
-              },
-            ],
-          }}
-          style={{display: 'none'}} // hide the default input and use the custom upload button
-          ref={ikUploadRefTest}
+          onSuccess={handleSuccess}
+          onUploadProgress={handleProgress}
+          onUploadStart={handleStartUpload}
+          folder ={fileType === "video" ? "/videos": "/images"  }
+          
         />
-        <p>Custom Upload Button</p>
-        {ikUploadRefTest && <button onClick={() => ikUploadRefTest.current.click()}>Upload</button>}
-        <p>Abort upload request</p>
-        {ikUploadRefTest && <button onClick={() => ikUploadRefTest.current.abort()}>Abort request</button>}
-     
-      {/* ...other SDK components added previously */}
+        {
+          uploading && (
+            <div className ="flex items-center gap-2 text-sm text-primary">
+              <Loader2 className="animate-spin w-4 h-4" />    
+              <span>Uploading...</span>
+              </div>
+          )
+        }
+        {
+          error && (
+            <div className="text-red-500 text-sm">{error}</div>
+          )
+        }
     </div>
   );
 }

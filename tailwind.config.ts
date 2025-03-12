@@ -1,5 +1,7 @@
 import type { Config } from "tailwindcss";
+import type { PluginCreator } from "tailwindcss/types/config";
 
+const daisyui = require("daisyui") as PluginCreator;
 export default {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -14,5 +16,10 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [daisyui],
+  daisyui: {
+    themes : ["dark"],
+    darkTheme: "dark",
+  },
+  darkMode: "class",
 } satisfies Config;

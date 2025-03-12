@@ -10,7 +10,7 @@ export interface Ivideo {
     _id? : mongoose.Types.ObjectId;
     title:String;
     description : string;
-    vidurl : string;
+    videoUrl : string;
     thumbnailurl: string;
     controls? : boolean
     transformation?: {
@@ -24,7 +24,7 @@ const vidschema = new Schema<Ivideo>(
     {
         title :{type : String , required : true},
         description :{type : String , required : true},
-        vidurl :{type : String , required : true},
+        videoUrl :{type : String , required : true},
        thumbnailurl :{type : String , required : true},
         controls :{type : Boolean , required : true},
         transformation :{

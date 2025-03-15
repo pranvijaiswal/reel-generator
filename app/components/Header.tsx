@@ -16,13 +16,18 @@ function Header()
       
     }
   }
-    return <div>
+    return (<div>
       <button onClick={handleSignout}>Sign out</button>
-      <Link href="/login">Login</Link>
+      {session?(
+        <div>Welcome</div>
+      ):(
+        <div><Link href="/login">Login</Link>
       <Link href="/register">Register</Link>
 
-    </div>;
-    
+    </div>
+      )}
+    </div>
+      )
 }
 
 export default Header;
